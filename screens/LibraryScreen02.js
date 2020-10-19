@@ -18,7 +18,7 @@ import _ from 'lodash';
 import { render } from 'react-dom';
 import { useLibraryList, useLibraryListUpdate } from '../store/QRContext';
 
-const maxItemHeight = 150; 
+const maxItemHeight = 151; 
 
 const LibraryScreen_02 = props => {
     const qrValue = useLibraryList()
