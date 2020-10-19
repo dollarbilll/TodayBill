@@ -6,9 +6,10 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/screens/TitlePage.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#ff2d11",
+      "width": "25%"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -16,11 +17,27 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "facebookScheme": "fb702588700600049",
+    "facebookAppId": "702588700600049",
+    "facebookDisplayName": "TodayBill",
     "ios": {
       "supportsTablet": true
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    }, 
+    "extra": {
+      "firebase": {
+        "apiKey": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "authDomain": "xxxxxxxxxx.firebaseapp.com",
+        "databaseURL": "xxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "projectId": "xxxxxxxxxx",
+        "storageBucket": "xxxxxxxxxx.appspot.com",
+        "messagingSenderId": "xxxxxxxxxxxx"
+      },
+      "facebook": {
+        "appId": "xxxxxxxxxxxxxxx"
+      }
     }
   }
 }
