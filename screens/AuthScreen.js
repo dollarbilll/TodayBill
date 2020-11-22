@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Button,
   Text,
+  TouchableOpacity
 } from 'react-native';
 // import { LinearGradient } from 'expo-linear-gradient';
 // import { useDispatch } from 'react-redux';
@@ -16,17 +17,67 @@ import Input from '../models/Input';
 import Card from '../models/Card';
 import Colors from '../constants/Colors';
 import * as authActions from '../store/actions/auth';
+import * as firebase from 'firebase';
+import ExpoStatusBar from 'expo-status-bar/build/ExpoStatusBar';
+import * as Facebook from 'expo-facebook';
+import firebaseConfig from '../utils/firebaseConfig';
+const facebookAppId = firebaseConfig.facebookAppId;
 
+export default class AuthScreen extends React.Component{
 
+    constructor(props){
+        super(props)
 
+        this.state = ({
+            email: '',
+            password: ''
+        })
+    }
 
+    onLoginSuccess() {
+        this.props.navigation.navigate('LibraryScreen02');
+      }
+      onLoginFailure(errorMessage) {
+        this.setState({ error: errorMessage, loading: false });
+      }
 
-// const AuthScreen = props => {
-//     const [emailValue, onChangeText] = React.useState('Email');
-//     const [passwordValue, onChangetext] = React.useState('Password');
+    componentDidMount() {
+        firebase.auth().onAuthStateChanged((user) => {
+            if(user != null) {
+                console.log(user)
+            }
+        })
+    }
 
-function AuthScreen({ navigation }) {
+    loginUser = ( email, password) => {
+        try{
+            firebase.auth().signInWithEmailAndPassword(email, password)
+            .then(this.onLoginSuccess.bind(this))
+                // console.log('success');
+        } catch(error){
+            alert(`Incorrect Email or Password`);
+        }
+    }
 
+    async logInWithFacebook() {
+        try {
+          // console.log(facebookAppId, typeof(facebookAppId));
+          await Facebook.initializeAsync(facebookAppId);
+          const { type, token } = await Facebook.logInWithReadPermissionsAsync({
+            permissions: ['public_profile'],
+          });
+          if (type === 'success') {
+            await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+            const credential = firebase.auth.FacebookAuthProvider.credential(token);
+            const facebookProfileData = await firebase.auth().signInWithCredential(credential);
+            this.onLoginSuccess.bind(this)
+          }
+        } catch ({ message }) {
+          alert(`Facebook Login Error: ${message}`);
+        }
+      }
+
+    render() {
     return (
         <ScrollView style={styles.authContainer}>
             <View style={styles.header}>
@@ -37,6 +88,7 @@ function AuthScreen({ navigation }) {
                     </View>
                 </View>
             </View>
+            {/* <View style={styles.cardFlex}> */}
             <View style={styles.cardContainer}>
                 <View style={styles.usernameContainer}> 
                     <View style={styles.iconContainer}>
@@ -53,9 +105,8 @@ function AuthScreen({ navigation }) {
                         borderLeftWidth: 0,
                         borderRightWidth: 0
                          }}
-                        // onChangeText={text => onChangeText(text)}
-                        // emailValue={emailValue}
-                        placeholder="Username"
+                        onChangeText={(email) => this.setState({email})}
+                        placeholder="Email"
                         placeholderTextColor="#B1B1B1"
                         returnKeyType="done"
                         textContentType="name"
@@ -83,47 +134,56 @@ function AuthScreen({ navigation }) {
                             returnKeyType="done"
                             textContentType="Password"
                             secureTextEntry={true}
-                            // onChangeText={text => onChangeText(text)}
-                            // passwordValue={passwordValue}
+                            onChangeText={(password) => this.setState({password})}
                         />
                     </View>
                 </View>
             </View>
+        {/* </View> */}
+        <View style={styles.buttonView}>
             <View style={styles.signInButtonContainer}>
                 <Button 
                 title="SIGN IN" 
                 color='white'
-                onPress={() => {
-                    /* 1. Navigate to the Details route with params */
-                    navigation.navigate('LibraryScreen02')
-                    // <signInWithFacebook/>
-                  }}
+                onPress={() => 
+                    this.loginUser(this.state.email, this.state.password)
+                    // .then(this.props.navigation.navigate('LibraryScreen02'))
+                  }
                 />
             </View>
+        </View>
+        <View style={styles.buttonView}>
+            <TouchableOpacity style={[styles.buttonContainer, styles.fabookButton]} onPress={() => this.logInWithFacebook()}>
+                <View style={styles.socialButtonContent}>
+            <AntDesign name="facebook-square" size={24} color="white" />
+            <Text style={styles.loginText}>     Sign in with Facebook</Text>
+                </View>
+            </TouchableOpacity>
+        </View>
             <View style={styles.switcherContainer}>
                 <Text style={styles.switchTextStyle}>Dont have an account?</Text>
-                <Text style={styles.switchButtonStyle} onPress={() => {navigation.navigate('SignUpScreen')}}
+                <Text style={styles.switchButtonStyle} onPress={() => {this.props.navigation.navigate('SignUpScreen')}}
                 >SIGN UP</Text> 
             </View>
-            
          </ScrollView>
     );
-};
+}
+}
 
 const styles = StyleSheet.create({
     header: 
     {
         width: '100%',
-        height: 230,
+        height: '35%',
         // flex: 1,
         backgroundColor: '#ff2508',
     },
     titleContainer:
     {
-        width: 300,
-        height: 77,
-        marginLeft: '25%',
-        marginTop: '20%'
+        width: '100%',
+        alignItems: 'center',
+        resizeMode: 'contain',
+        marginTop: '17%'
         
     },
     titleText: 
@@ -135,10 +195,11 @@ const styles = StyleSheet.create({
     subtitleContainer:
     {
         width: 221,
+        alignItems: 'center',
+        resizeMode: 'contain',
         height: 77,
         color: '#ffffff',
-        marginLeft: '7%',
-        marginVertical: 10
+        // marginVertical: 10
 
     },
     subtitleText: 
@@ -150,11 +211,11 @@ const styles = StyleSheet.create({
     },
     authContainer: 
     {
-        // padding: 20
+        
     },
     usernameContainer: {
-        width: 300,
-        height: 100,
+        width: '80%',
+        height: '10%',
         flexDirection: 'row',
         flex: 1,
         // padding: 5,
@@ -164,21 +225,27 @@ const styles = StyleSheet.create({
     iconContainer: {
         marginBottom: 20
     },
+    cardFlex: {
+        // flexGrow: 2
+    },
     cardContainer: 
     {
-        width: 200,
-        height: 100,
+        width: '100%',
+        flexGrow: 5,
+        alignItems: 'center',
+        resizeMode: 'contain',
+        // height: '10%',
         //opacity: 0.4,
         color: '#2e2e2e',
         fontFamily: 'montserrat-regular',
         fontSize: 16,
         fontWeight: '500',
-        marginLeft: 33,
-        marginTop: 175,
+        // marginLeft: 33,
+        marginTop: '35%',
     },
     signInButtonContainer:
     {
-        width: 311,
+        width: '75%',
         height: 49,
         shadowColor: 'rgba(0, 153, 145, 0.32)',
         shadowOffset: { width: 4, height: 1 },
@@ -186,18 +253,19 @@ const styles = StyleSheet.create({
         shadowOpacity: 1,
         borderRadius: 4,
         backgroundColor: '#ff2508',
-        marginTop: 60,
+        marginTop: '10%',
         marginHorizontal: 32,
         justifyContent: 'center',
         // elevation: 5
     },
     switcherContainer: 
     {
-        width: '60%',
+        width: '100%',
+        justifyContent: 'center',
         flexDirection: 'row',
-        justifyContent: 'space-around',
-        marginLeft: 75,
-        marginTop: 40
+        // justifyContent: 'space-around',
+        // marginLeft: 75,
+        marginTop: '10%',
         
     },
     switchTextStyle: {
@@ -212,9 +280,34 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '700',
         color: '#ff2508',
-    }
+    },
+    buttonView: {
+        width: '100%',
+        alignItems: 'center',
+        resizeMode: 'contain'
+    },
+    buttonContainer: {
+        height:49,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 10,
+        width:'75%',
+        borderRadius:4,
+      },
+      fabookButton: {
+        backgroundColor: "#3b5998",
+      },
+      socialButtonContent:{
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center', 
+      },
+      loginText: {
+        color: 'white',
+      },
 
 
 })
 
-export default AuthScreen;
+// export default AuthScreen;

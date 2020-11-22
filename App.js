@@ -39,8 +39,11 @@ const fetchFonts = () => {
   });
 };
 
-
+//firebase,firestore
+require("firebase/firestore");
 firebase.initializeApp(firebaseConfig);
+var db = firebase.firestore();
+
 
 
 export default function App( {navigation} ) {
@@ -108,6 +111,9 @@ export default function App( {navigation} ) {
       <Stack.Screen 
         name="SignUpScreen" 
         component={SignUpScreen} 
+        options={{
+          headerLeft: null
+        }}
         />
     </Stack.Navigator>
   </NavigationContainer>

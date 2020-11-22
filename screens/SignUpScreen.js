@@ -11,7 +11,8 @@ import {
     Keyboard,
     TouchableWithoutFeedback,
     Platform,
-    Image
+    Image,
+    ScrollView
   } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { AntDesign } from '@expo/vector-icons'; 
@@ -24,6 +25,7 @@ import * as Segment from 'expo-analytics-segment';
 
 import firebaseConfig from '../utils/firebaseConfig';
 import LibraryScreen_02 from './LibraryScreen02';
+import { zip } from 'lodash';
 
 export const isAndroid = () => Platform.OS === 'android';
 
@@ -36,12 +38,12 @@ const androidClientId =
   firebaseConfig.androidClientId;
 
 const IOSClientId = 
-  firebaseConfig.iosClidentId;
+  firebaseConfig.iosClientId;
 
     //this.props.navigator.navigate()
 
 class SignUpScreen extends React.Component {
-    state = { email: '', password: '', errorMessage: '', loading: false };
+    state = { name: '', zipcode: '', birthdate: '', gender: '', email: '', password: '', errorMessage: '', loading: false };
     constructor( props ) {
       super(props);
     }
@@ -60,10 +62,10 @@ class SignUpScreen extends React.Component {
         );
       }
     }
-    async signInWithEmail() {
+    async signUpWithEmail() {
       await firebase
         .auth()
-        .signInWithEmailAndPassword(this.state.email, this.state.password)
+        .createUserWithEmailAndPassword(this.state.email, this.state.password)
         .then(this.onLoginSuccess.bind(this))
         .catch(error => {
             let errorCode = error.code;
@@ -73,11 +75,13 @@ class SignUpScreen extends React.Component {
             } else {
                 this.onLoginFailure.bind(this)(errorMessage);
             }
-        });
+        })
+        
+        alert('Success!');
     }
-    async signInWithFacebook() {
+    async signUpWithFacebook() {
       try {
-        console.log(facebookAppId, typeof(facebookAppId));
+        // console.log(facebookAppId, typeof(facebookAppId));
         await Facebook.initializeAsync(facebookAppId);
         const { type, token } = await Facebook.logInWithReadPermissionsAsync({
           permissions: ['public_profile'],
@@ -92,28 +96,29 @@ class SignUpScreen extends React.Component {
         alert(`Facebook Login Error: ${message}`);
       }
     }
-    async signInWithGoogle() {
-      try {
-        const result = await Expo.Google.logInAsync({
-          androidClientId: androidClientId,
-          iosClientId: IOSClientId,
-          behavior: 'web',
-          iosClientId: '', //enter ios client id
-          scopes: ['profile', 'email']
-        });
+    // async signInWithGoogle() {
+    //   try {
+    //     const result = await Expo.Google.logInAsync({
+    //       androidClientId: androidClientId,
+    //       iosClientId: IOSClientId,
+    //       behavior: 'web',
+    //       iosClientId: '', //enter ios client id
+    //       scopes: ['profile', 'email']
+    //     });
         
-        if (result.type  === 'success') {
-          await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-          const credential = firebase.auth.GoogleAuthProvider.credential(data.idToken, data.accessToken);
-          const googleProfileData = await firebase.auth().signInWithCredential(credential);
-          this.onLoginSuccess.bind(this);
-        }
-      } catch ({ message }) {
-        alert('login: Error:' + message);
-      }
-    }
+    //     if (result.type  === 'success') {
+    //       await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+    //       const credential = firebase.auth.GoogleAuthProvider.credential(data.idToken, data.accessToken);
+    //       const googleProfileData = await firebase.auth().signInWithCredential(credential);
+    //       this.onLoginSuccess.bind(this);
+    //     }
+    //   } catch ({ message }) {
+    //     alert('login: Error:' + message);
+    //   }
+    // }
     render() {
     return (
+      <ScrollView style={styles.scrollContainer}>
       <TouchableWithoutFeedback
         onPress={() => {
           Keyboard.dismiss();
@@ -128,8 +133,8 @@ class SignUpScreen extends React.Component {
                 placeholderTextColor="#B1B1B1"
                 returnKeyType="next"
                 //Type="name"
-                value={this.state.displayName}
-                onChangeText={displayName => this.setState({ displayName })}
+                value={this.state.name}
+                onChangeText={name => this.setState({ name })}
               />
               <TextInput
                 style={styles.input}
@@ -137,8 +142,8 @@ class SignUpScreen extends React.Component {
                 placeholderTextColor="#B1B1B1"
                 returnKeyType="done"
                 //textContentType="postalCode"
-                value={this.state.password}
-                onChangeText={password => this.setState({ password })}
+                value={this.state.zipcode}
+                onChangeText={zipcode => this.setState({ zipcode })}
               />
               <TextInput
                 style={styles.input}
@@ -146,8 +151,8 @@ class SignUpScreen extends React.Component {
                 placeholderTextColor="#B1B1B1"
                 returnKeyType="done"
                 //textContentType="none"
-                value={this.state.password}
-                onChangeText={password => this.setState({ password })}
+                value={this.state.birthdate}
+                onChangeText={birthdate => this.setState({ birthdate })}
               />
               <TextInput
                 style={styles.input}
@@ -155,8 +160,8 @@ class SignUpScreen extends React.Component {
                 placeholderTextColor="#B1B1B1"
                 returnKeyType="done"
                 //textContentType="none"
-                value={this.state.password}
-                onChangeText={password => this.setState({ password })}
+                value={this.state.gender}
+                onChangeText={gender => this.setState({ gender })}
               />
               <TextInput
                 style={styles.input}
@@ -190,32 +195,39 @@ class SignUpScreen extends React.Component {
             >
               {this.state.error}
             </Text>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={{ width: '86%', marginTop: 10, marginBottom: 10 }}
-              onPress={() => this.signInWithEmail()}
-            onPress={() => { navigation.navigate('AuthScreen')}}
+              onPress={() => this.signUpWithEmail()}
+            onPress={() => { this.props.navigation.navigate('AuthScreen')}} 
             >
                 <Text>Sign Up</Text>
-            </TouchableOpacity>
-          <TouchableOpacity style={[styles.buttonContainer, styles.fabookButton]} onPress={() => this.signInWithFacebook()}>
+            </TouchableOpacity> */}
+            <TouchableOpacity 
+            style={[styles.buttonContainer, styles.signUpButton]}
+            onPress={() => 
+                this.signUpWithEmail(this.state.email, this.state.password)
+                // console.log(this.state.email)
+              }
+            // onPress={() => { this.props.navigation.navigate('AuthScreen')}} 
+            >
+          <View style={styles.socialButtonContent}>
+            {/* <AntDesign name="twiSigtter" size={24} color="white" /> */}
+            <Text style={styles.loginText}>     SIGN UP</Text>
+          </View>
+        </TouchableOpacity>
+          <TouchableOpacity style={[styles.buttonContainer, styles.fabookButton]} onPress={() => this.signUpWithFacebook()}>
             <View style={styles.socialButtonContent}>
             <AntDesign name="facebook-square" size={24} color="white" />
-            <Text style={styles.loginText}>     Continue with Facebook</Text>
+            <Text style={styles.loginText}>     Sign Up with Facebook</Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.buttonContainer, styles.twitterButton]}>
-          <View style={styles.socialButtonContent}>
-            <AntDesign name="twitter" size={24} color="white" />
-            <Text style={styles.loginText}>     Continue with Twitter</Text>
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.buttonContainer, styles.googleButton]}>
+        {/* <TouchableOpacity style={[styles.buttonContainer, styles.googleButton]}>
           <View style={styles.socialButtonContent}>
             <AntDesign name="google" size={24} color="black" />
             <Text style={styles.loginText_Black}>   Continue with Google</Text>
           </View>
-        </TouchableOpacity>
-            <View style={{ marginTop: 10 }}>
+        </TouchableOpacity> */}
+            <View style={{ marginTop: 15, marginBottom: '20%' }}>
               <Text
                 style={{ fontWeight: '200', fontSize: 17, textAlign: 'center' }}
                 onPress={() => {
@@ -228,11 +240,15 @@ class SignUpScreen extends React.Component {
           </KeyboardAvoidingView>
         </SafeAreaView>
        </TouchableWithoutFeedback>
+       </ScrollView>
     );
   }
 }
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    backgroundColor: 'white'
+  },
   container: {
     flex: 1,
     flexDirection: 'column',
@@ -241,7 +257,8 @@ const styles = StyleSheet.create({
   },
   form: {
     width: '86%',
-    marginTop: 15
+    marginTop: '20%',
+    marginBottom: '10%'
   },
   logo: {
     marginTop: 20
@@ -258,9 +275,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom:20,
-    width:250,
-    borderRadius:30,
+    marginBottom: 10,
+    marginTop: 10,
+    width:'75%',
+    borderRadius:4,
   },
   fabookButton: {
     backgroundColor: "#3b5998",
@@ -280,15 +298,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 22
+    borderRadius: 4
   },
-  twitterButton: {
-    backgroundColor: '#00ACEE',
+  signUpButton: {
+    backgroundColor: '#ff2508',
     height: 44,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 22
+    borderRadius: 4
   },
   googleButton: {
     backgroundColor: '#FFFFFF',

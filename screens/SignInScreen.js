@@ -33,7 +33,7 @@ const androidClientId =
   firebaseConfig.androidClientId;
 
 const IOSClientId = 
-  firebaseConfig.iosClidentId;
+  firebaseConfig.iosClientId;
 
   
 

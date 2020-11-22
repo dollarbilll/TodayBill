@@ -5,6 +5,7 @@ import { useLibraryList, useLibraryListUpdate } from '../store/QRContext';
 
 import Playbill from '../models/PlaybillConstructor';
 
+
 export default function QRScreen({ 
   navigation, 
   //onScanned,
@@ -24,35 +25,20 @@ export default function QRScreen({
     })();
   }, []);
 
-  //so using handleBarCodeScanned with { type, data } I can pass 
-  const handleBarCodeScanned = ({ type, data: url }) => {
+  const handleBarCodeScanned = ({ itemData, type, data: url }) => {
     setScanned(true);
-    // alert(`Bar code with type ${type} and data ${data} has been scanned!`);
-    
-    //use a firestore server --> make a network request to get an arrau somewhere else --> firestore server for storage ~ user  
-    
-    // data is a url .. given this url, 
-    // give me the coevr photo url and an id associated to the pdf for it 
-    
-    // data url 
-    // cover photo url 
-    // id --> all goes in function 
-
     new Playbill 
-    //context
     addQRValue(url);
-    //navigation.navigate('PDFScreen'..item.id)
+    console.log(itemData);
+    
+    navigation.navigate('PDFScreen', 
+                    {
+                        pdfId: itemData.item.id,
+                        imageUri: itemData.item.imageUri
+                    });
+                    console.log(itemData.item);
+                    
 
-
-    //So after alert, this will navigation.navigate(LibraryScreen) and the 'type' and 'data' will be used to add '$playbill' to the library flatlist
-    //How can dylan's dashboard view show the contents of each users' library flatlists?
-    //so 1. pass data from qr code back to library flatlist and 2. render the flatlist to firebase 
-
-    // react navigation: navigating with route parameters *from libraryscreen to pdfscreen
-
-    //either react-redux or useContext *an event thats broadcasted in the entire app that a new QR code was scanned 
-    //the library adds a unit to the array
-    //libraryscreen will have some way of adding to array 
   };
 
   if (hasPermission === null) {
@@ -74,7 +60,7 @@ export default function QRScreen({
         style={StyleSheet.absoluteFillObject}
       />
 
-      {scanned && <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />}
+      {scanned && <Button title={'Scan Complete'} onPress={() => setScanned(false)} />}
     </View>
   );
 }

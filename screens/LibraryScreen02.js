@@ -18,7 +18,7 @@ import _ from 'lodash';
 import { render } from 'react-dom';
 import { useLibraryList, useLibraryListUpdate } from '../store/QRContext';
 
-const maxItemHeight = 151; 
+const maxItemHeight = 151;
 
 const LibraryScreen_02 = props => {
     const qrValue = useLibraryList()
@@ -36,20 +36,16 @@ const LibraryScreen_02 = props => {
                     });
                     }
                 } >
-                {/* practice getting pdfscreen to be specific pdf, so navigate to a screen thats based on params and isn't always the same thing.  */}
-            
                 <View style={styles.libraryItem}>
                     <Image 
                          source={{uri: itemData.item.imageUri}} 
                             style={{ width: 100, height: maxItemHeight-25, resizeMode: 'contain'}}
                         
                          />
-                    {/* <Text>{itemData.item.imageUri}</Text> */}
                 </View>
             </TouchableOpacity>
     );
 };
-
     return (
         <ScrollView style={styles.screen}>  
             <View style={styles.buttonContainer}> 
