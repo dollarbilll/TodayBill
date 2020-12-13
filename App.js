@@ -1,19 +1,22 @@
-import React, { useState, useEffect } from 'react';
-console.log("1");
-import { View, Text, Button, Image, Alert } from 'react-native';
-console.log("2");
-import { NavigationContainer, useLinkProps } from '@react-navigation/native';
-console.log("3");
-import { createSwitchNavigator, createStackNavigator } from '@react-navigation/stack';
-console.log("4");
-import { AppLoading } from 'expo';
-console.log("5");
-import * as Font from 'expo-font';
-console.log("6");
+//firebase,firestore
 import * as firebase from 'firebase';
-import SplashScreen from 'react-native-splash-screen'
-// import { firebaseConfig } from './config/firebase.js';
-// import { Facebook } from "expo"; 
+import firebaseConfig from './utils/firebaseConfig';
+firebase.initializeApp(firebaseConfig);
+require("firebase/firestore");
+var db = firebase.firestore();
+
+import React, { useState, useEffect } from 'react';
+
+import { View, Text, Button, Image, Alert } from 'react-native';
+
+import { NavigationContainer, useLinkProps } from '@react-navigation/native';
+
+import { createStackNavigator } from '@react-navigation/stack';
+
+import { AppLoading } from 'expo';
+
+import * as Font from 'expo-font';
+
 
 
 import AuthScreen from './screens/AuthScreen';
@@ -21,8 +24,8 @@ import LibraryScreen02 from './screens/LibraryScreen02';
 import QRScreen from './screens/QRScreen';
 import PDFScreen from './screens/PDFScreen';
 import SignUpScreen from './screens/SignUpScreen';
-import firebaseConfig from './utils/firebaseConfig';
-import SignInScreen from './screens/SignInScreen';
+// import LoadingScreen from './screens/LoadingScreen';
+
 
 //context
 import { QRProvider } from './store/QRContext';
@@ -39,12 +42,12 @@ const fetchFonts = () => {
   });
 };
 
-//firebase,firestore
-require("firebase/firestore");
-firebase.initializeApp(firebaseConfig);
-var db = firebase.firestore();
+function signOutUser ( {navigation} ) {
 
+      navigation.navigate('AuthScreen');
+      console.log('e');
 
+}
 
 export default function App( {navigation} ) {
   console.log("16");
@@ -59,6 +62,12 @@ export default function App( {navigation} ) {
       />
     );
   }
+
+    
+
+  //no capital latter in input fields
+  //loading screen/animation for log in / sign up into library 
+  //catch(error) and alert(error) for 
   
 
   return (
@@ -66,7 +75,7 @@ export default function App( {navigation} ) {
     <QRProvider>
     <NavigationContainer>
     <Stack.Navigator 
-      initialRouteName="AuthScreen"
+      initialRouteName="Auth"
       screenOptions={{
         headerStyle: {
           backgroundColor: '#FF2D11',
@@ -75,12 +84,15 @@ export default function App( {navigation} ) {
         headerTitleStyle: {
           fontFamily: 'graphique-regular',
           fontSize: 35,
-          fontWeight: '700',
-          color: 'white'
+          fontWeight: '200',
+          color: 'white',
+          textAlign: 'center'
         },
         title: 'TODAYBILL',
         headerBackTitle: 'Back'
       }} >
+      {/* <Stack.Screen name="LoadingScreen" component={LoadingScreen}
+      /> */}
       <Stack.Screen name="AuthScreen" component={AuthScreen} 
       options={{
         headerTransparent: true,
@@ -93,16 +105,6 @@ export default function App( {navigation} ) {
           options={{
             headerLeft: null,
             headerRight: null
-            
-            // () => (
-            //   <Button
-            //     onPress={() => navigation.navigate('AuthScreen')}
-            //     title="Log Out"
-            //     color="#fff"
-                  
-
-            //   />
-            // ),
           }}
 
           />

@@ -5,7 +5,8 @@ import {
   StyleSheet,
   Button,
   Text,
-  TouchableOpacity
+  TouchableOpacity,
+  Alert
 } from 'react-native';
 // import { LinearGradient } from 'expo-linear-gradient';
 // import { useDispatch } from 'react-redux';
@@ -44,19 +45,22 @@ export default class AuthScreen extends React.Component{
     componentDidMount() {
         firebase.auth().onAuthStateChanged((user) => {
             if(user != null) {
-                console.log(user)
+                // console.log(user)
             }
         })
     }
 
     loginUser = ( email, password) => {
-        try{
+       
             firebase.auth().signInWithEmailAndPassword(email, password)
             .then(this.onLoginSuccess.bind(this))
-                // console.log('success');
-        } catch(error){
-            alert(`Incorrect Email or Password`);
-        }
+            .catch(error => {
+                    let errorCode = error.code;
+                    let errorMessage = error.message;
+                    this.onLoginFailure.bind(this)(alert("Incorrect Email or Password"));
+                
+                })
+        
     }
 
     async logInWithFacebook() {
@@ -71,6 +75,7 @@ export default class AuthScreen extends React.Component{
             const credential = firebase.auth.FacebookAuthProvider.credential(token);
             const facebookProfileData = await firebase.auth().signInWithCredential(credential);
             this.onLoginSuccess.bind(this)
+            this.props.navigation.navigate('LibraryScreen02')
           }
         } catch ({ message }) {
           alert(`Facebook Login Error: ${message}`);
@@ -84,7 +89,7 @@ export default class AuthScreen extends React.Component{
                 <View style={styles.titleContainer}>
                     <Text style={styles.titleText}>TodayBill</Text>
                     <View style={styles.subtitleContainer}>
-                        <Text style={styles.subtitleText}>Keep your playbills digitally on hand!</Text>
+                        <Text style={styles.subtitleText}>Keep your programs digitally on hand!</Text>
                     </View>
                 </View>
             </View>
@@ -92,7 +97,7 @@ export default class AuthScreen extends React.Component{
             <View style={styles.cardContainer}>
                 <View style={styles.usernameContainer}> 
                     <View style={styles.iconContainer}>
-                        <MaterialCommunityIcons name="account" size={30} color="gray" />
+                        {/* <MaterialCommunityIcons name="account" size={30} color="gray" /> */}
                     </View>
                     <View >
                     <TextInput
@@ -100,7 +105,7 @@ export default class AuthScreen extends React.Component{
                         height: 20, 
                         width: 230, 
                         borderColor: 'gray', 
-                        borderWidth: 2,
+                        borderWidth: 1,
                         borderTopWidth: 0,
                         borderLeftWidth: 0,
                         borderRightWidth: 0
@@ -110,12 +115,13 @@ export default class AuthScreen extends React.Component{
                         placeholderTextColor="#B1B1B1"
                         returnKeyType="done"
                         textContentType="name"
+                        autoCapitalize='none'
                     />
                     </View>
                 </View>
                 <View style={styles.usernameContainer}> 
                     <View style={styles.iconContainer}>
-                        <AntDesign name="lock" size={30} color="gray" />
+                        {/* <AntDesign name="lock" size={30} color="gray" /> */}
                     </View>
                     <View >
                         <TextInput
@@ -123,7 +129,7 @@ export default class AuthScreen extends React.Component{
                                 height: 20, 
                                 width: 230, 
                                 borderColor: 'gray', 
-                                borderWidth: 2,
+                                borderWidth: 1,
                                 borderTopWidth: 0,
                                 borderLeftWidth: 0,
                                 borderRightWidth: 0,
@@ -133,6 +139,7 @@ export default class AuthScreen extends React.Component{
                             placeholderTextColor="#B1B1B1"
                             returnKeyType="done"
                             textContentType="Password"
+                            autoCapitalize='none'
                             secureTextEntry={true}
                             onChangeText={(password) => this.setState({password})}
                         />
@@ -141,16 +148,15 @@ export default class AuthScreen extends React.Component{
             </View>
         {/* </View> */}
         <View style={styles.buttonView}>
-            <View style={styles.signInButtonContainer}>
-                <Button 
-                title="SIGN IN" 
-                color='white'
+            
+            <TouchableOpacity style={[styles.buttonContainer, styles.signInButton]}
                 onPress={() => 
-                    this.loginUser(this.state.email, this.state.password)
-                    // .then(this.props.navigation.navigate('LibraryScreen02'))
-                  }
-                />
-            </View>
+                    this.loginUser(this.state.email, this.state.password)}>
+                    
+                <View style={styles.socialButtonContent}>
+                    <Text style={styles.loginText}>     Sign In</Text>
+                </View>
+            </TouchableOpacity>
         </View>
         <View style={styles.buttonView}>
             <TouchableOpacity style={[styles.buttonContainer, styles.fabookButton]} onPress={() => this.logInWithFacebook()}>
@@ -207,7 +213,8 @@ const styles = StyleSheet.create({
         fontFamily: 'montserrat-bold',
         fontSize: 16,
         fontWeight: '700',
-        color: 'white'
+        color: 'white',
+        textAlign: 'center'
     },
     authContainer: 
     {
@@ -219,8 +226,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flex: 1,
         // padding: 5,
-        justifyContent: 'space-around',
-        // marginVertical: 20
+        justifyContent: 'center',
+        marginTop: '5%'
     },
     iconContainer: {
         marginBottom: 20
@@ -266,6 +273,7 @@ const styles = StyleSheet.create({
         // justifyContent: 'space-around',
         // marginLeft: 75,
         marginTop: '10%',
+        marginBottom: '15%'
         
     },
     switchTextStyle: {
@@ -297,6 +305,10 @@ const styles = StyleSheet.create({
       },
       fabookButton: {
         backgroundColor: "#3b5998",
+        height: 49  
+      },
+      signInButton: {
+        backgroundColor: '#ff2508'
       },
       socialButtonContent:{
         flexDirection: 'row',

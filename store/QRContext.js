@@ -1,9 +1,16 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { PLAYBILLS } from '../DummyData';
 import Playbill from '../models/PlaybillConstructor';
+import { random } from 'lodash';
 
 const QRContext = React.createContext()
 const QRUpdateContext = React.createContext() 
+
+// import * as firebase from 'firebase';
+// var db = firebase.firestore();
+// var user = firebase.auth().currentUser;
+
+
 
 export function useLibraryList(){
     return useContext(QRContext)
@@ -15,13 +22,29 @@ export function useLibraryListUpdate() {
 
 export function QRProvider({ children }) {
     const [everythingcurrentlyintheuserslibrary, seteverythingcurrentlyintheuserslibrary] = useState(PLAYBILLS)
-    //can the state here be a collection in firestore ("user_playbills") instead of this local array?
 
-    function addQRValue(newurl) {
-        // QRCodeContents.split
-        let newplaybilladd = new Playbill('newid', newurl, 'https://bsp-static.playbill.com/dims4/default/d141621/2147483647/resize/x250%3C/quality/90/?url=http%3A%2F%2Fpb-asset-replication.s3.amazonaws.com%2Fbb%2F80%2Fa7e233a14c26867a10bf0dfb566d%2Fbeetlejuice-playbill-2019-03-28-web.jpg');
-        // console.log({newurl, everythingcurrentlyintheuserslibrary, newplaybilladd});
-        seteverythingcurrentlyintheuserslibrary(everythingcurrentlyintheuserslibrary.concat([newplaybilladd]))
+    // initializing library with current user's playbills from firestore 
+    useEffect(
+        () => {
+            const loadUserData = async() => { 
+                const playbillFirestore = await db.get(everythinginthatcollectionuid)
+                console.log(everythinginthatcollectionuid)
+                seteverythingcurrentlyintheuserslibrary(playbillFirestore) 
+            }
+            loadUserData()            
+        }, []
+    )
+
+    function addQRValue(qrdataContext) {
+        
+        let qrContextArray = qrdataContext.toString().split(",");
+        let image = qrContextArray[0];
+        let pdf = qrContextArray[1];
+        let id = qrContextArray[2];
+        let newplaybilladd = new Playbill(id, image, pdf);
+        // console.log(newplaybilladd)
+        seteverythingcurrentlyintheuserslibrary(everythingcurrentlyintheuserslibrary.concat([newplaybilladd]));
+        // console.log(everythingcurrentlyintheuserslibrary);
     }
   
     return(

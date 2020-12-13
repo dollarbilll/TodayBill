@@ -1,8 +1,8 @@
 class Playbill {
-    constructor(id, uri, imageUri) {
+    constructor(id, image, pdf) {
         this.id = id;
-        this.uri = uri;
-        this.imageUri = imageUri; 
+        this.image = image;
+        this.pdf = pdf; 
     }
 }
 

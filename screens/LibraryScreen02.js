@@ -20,7 +20,7 @@ import { useLibraryList, useLibraryListUpdate } from '../store/QRContext';
 
 const maxItemHeight = 151;
 
-const LibraryScreen_02 = props => {
+const LibraryScreen02 = props => {
     const qrValue = useLibraryList()
     const addQRValue = useLibraryListUpdate()
 
@@ -31,21 +31,21 @@ const LibraryScreen_02 = props => {
             onPress={() => {
                 props.navigation.navigate('PDFScreen', 
                     {
-                        pdfId: itemData.item.id,
-                        imageUri: itemData.item.imageUri
+                        pdf: itemData.item.pdf,
+                        image: itemData.item.image
                     });
                     }
                 } >
                 <View style={styles.libraryItem}>
                     <Image 
-                         source={{uri: itemData.item.imageUri}} 
-                            style={{ width: 100, height: maxItemHeight-25, resizeMode: 'contain'}}
-                        
+                         source={{uri: itemData.item.image}} 
+                            style={{ width: 75, height: maxItemHeight-50, resizeMode: 'contain'}}
                          />
                 </View>
             </TouchableOpacity>
     );
 };
+
     return (
         <ScrollView style={styles.screen}>  
             <View style={styles.buttonContainer}> 
@@ -85,7 +85,7 @@ const LibraryScreen_02 = props => {
     )
 }
 
-//LibraryScreen_02.navigationOptions
+//LibraryScreen02.navigationOptions
 
 const styles = StyleSheet.create({
     libraryItem: {
@@ -99,8 +99,8 @@ const styles = StyleSheet.create({
     buttonContainer: {
         width: '100%',
         alignItems: 'center',
-        resizeMode: 'contain'
-        // height: '15%',
+        resizeMode: 'contain',
+        
         
     },
     screen: {
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
 
     },
     shelving: {
-        
+        marginBottom: '10%'
     },
     gradient: {
         position: "absolute",
@@ -136,4 +136,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default LibraryScreen_02;
+export default LibraryScreen02;

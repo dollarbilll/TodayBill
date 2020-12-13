@@ -12,7 +12,8 @@ import {
     TouchableWithoutFeedback,
     Platform,
     Image,
-    ScrollView
+    ScrollView,
+    Alert
   } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { AntDesign } from '@expo/vector-icons'; 
@@ -24,15 +25,14 @@ import * as Google from 'expo-google-app-auth';
 import * as Segment from 'expo-analytics-segment';
 
 import firebaseConfig from '../utils/firebaseConfig';
-import LibraryScreen_02 from './LibraryScreen02';
+import LibraryScreen02 from './LibraryScreen02';
 import { zip } from 'lodash';
 
 export const isAndroid = () => Platform.OS === 'android';
 
-
   const facebookAppId = 
   firebaseConfig.facebookAppId;
-console.log(facebookAppId, typeof(facebookAppId));
+// console.log(facebookAppId, typeof(facebookAppId));
 
 const androidClientId = 
   firebaseConfig.androidClientId;
@@ -42,13 +42,18 @@ const IOSClientId =
 
     //this.props.navigator.navigate()
 
+    //firestore
+    // var db = firebase.firestore();
+    // var user = firebase.auth().currentUser;
+
 class SignUpScreen extends React.Component {
-    state = { name: '', zipcode: '', birthdate: '', gender: '', email: '', password: '', errorMessage: '', loading: false };
+    state = { name: '', zipcode: '', birthdate: '', gender: '', email: '', password: '', password2: '', errorMessage: '', loading: false };
     constructor( props ) {
       super(props);
     }
     onLoginSuccess() {
       this.props.navigation.navigate('LibraryScreen02');
+      
     }
     onLoginFailure(errorMessage) {
       this.setState({ error: errorMessage, loading: false });
@@ -71,13 +76,29 @@ class SignUpScreen extends React.Component {
             let errorCode = error.code;
             let errorMessage = error.message;
             if (errorCode == 'auth/weak-password') {
-                this.onLoginFailure.bind(this)('Weak Password!');
+                this.onLoginFailure.bind(this)(alert('Weak Password!'));
             } else {
-                this.onLoginFailure.bind(this)(errorMessage);
+                this.onLoginFailure.bind(this)(alert('Inputs are badly formatted!'));
             }
         })
+        //firestore
+        var db = firebase.firestore();
+        var user = firebase.auth().currentUser;
+        db.collection("users").doc(user.uid).set({
+          email: this.state.email,
+          name: this.state.name,
+          zipcode: this.state.zipcode,
+          birthdate: this.state.birthdate,
+          gender: this.state.gender
+        }, { merge: true })
+        .then(function(docRef) {
+          console.log("Document written with ID: ");
+       })
+        .catch(function(error) {
+          console.error("Error adding document: ", error);
+       });
+       console.log(this.state.name, this.state.zipcode, this.state.birthdate, this.state.gender);
         
-        alert('Success!');
     }
     async signUpWithFacebook() {
       try {
@@ -132,7 +153,6 @@ class SignUpScreen extends React.Component {
                 placeholder="Name"
                 placeholderTextColor="#B1B1B1"
                 returnKeyType="next"
-                //Type="name"
                 value={this.state.name}
                 onChangeText={name => this.setState({ name })}
               />
@@ -141,7 +161,7 @@ class SignUpScreen extends React.Component {
                 placeholder="Zip Code"
                 placeholderTextColor="#B1B1B1"
                 returnKeyType="done"
-                //textContentType="postalCode"
+                textContentType="postalCode"
                 value={this.state.zipcode}
                 onChangeText={zipcode => this.setState({ zipcode })}
               />
@@ -183,6 +203,16 @@ class SignUpScreen extends React.Component {
                 value={this.state.password}
                 onChangeText={password => this.setState({ password })}
               />
+              <TextInput
+                style={styles.input}
+                placeholder="Confirm Password"
+                placeholderTextColor="#B1B1B1"
+                returnKeyType="done"
+                textContentType="newPassword"
+                secureTextEntry={true}
+                value={this.state.password2}
+                onChangeText={password2 => this.setState({ password2 })}
+              />
             </View>
             {this.renderLoading()}
             <Text
@@ -195,13 +225,6 @@ class SignUpScreen extends React.Component {
             >
               {this.state.error}
             </Text>
-            {/* <TouchableOpacity
-              style={{ width: '86%', marginTop: 10, marginBottom: 10 }}
-              onPress={() => this.signUpWithEmail()}
-            onPress={() => { this.props.navigation.navigate('AuthScreen')}} 
-            >
-                <Text>Sign Up</Text>
-            </TouchableOpacity> */}
             <TouchableOpacity 
             style={[styles.buttonContainer, styles.signUpButton]}
             onPress={() => 

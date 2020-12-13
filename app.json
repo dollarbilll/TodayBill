@@ -35,7 +35,9 @@
         "messagingSenderId": "xxxxxxxxxxxx"
       },
       "facebook": {
-        "appId": "xxxxxxxxxxxxxxx"
+        "appId": "xxxxxxxxxxxxxxx",
+        "Scheme": "fb702588700600049",
+        "DisplayName": "TodayBill"
       }
     }
   }
