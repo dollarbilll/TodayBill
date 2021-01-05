@@ -28,23 +28,31 @@ export function QRProvider({ children }) {
         () => {
             const loadUserData = async() => { 
                 const playbillFirestore = await db.get(everythinginthatcollectionuid)
-                console.log(everythinginthatcollectionuid)
                 seteverythingcurrentlyintheuserslibrary(playbillFirestore) 
             }
             loadUserData()            
+            // console.log(playbillFirestore)
         }, []
     )
 
     function addQRValue(qrdataContext) {
         
         let qrContextArray = qrdataContext.toString().split(",");
+        // let qrContextArray = qrdataContext;
+        console.log("qrContextArray" + qrContextArray)
+        console.log("qrdataContext" + qrdataContext)
+
         let image = qrContextArray[0];
         let pdf = qrContextArray[1];
         let id = qrContextArray[2];
         let newplaybilladd = new Playbill(id, image, pdf);
-        // console.log(newplaybilladd)
+        // console.log("pdf" + pdf)
+        // console.log("image" + image)
+        // console.log("id" + id)
+        console.log("newplaybilladd" + newplaybilladd)
         seteverythingcurrentlyintheuserslibrary(everythingcurrentlyintheuserslibrary.concat([newplaybilladd]));
-        // console.log(everythingcurrentlyintheuserslibrary);
+        // console.log(everythingcurrentlyintheuserslibrary)
+        console.log(PLAYBILLS)
     }
   
     return(

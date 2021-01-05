@@ -21,10 +21,8 @@ export default function QRScreen({
   const [scanned, setScanned] = useState(false);
 
   //firestore
-  var db = firebase.firestore();
-  var user = firebase.auth().currentUser;
-  
-
+    var db = firebase.firestore();
+    var user = firebase.auth().currentUser;
 
   useEffect(() => {
     (async () => {
@@ -41,28 +39,40 @@ export default function QRScreen({
     let pdf = qrArray[1]
     // let id = user.getIdToken()
     let id = user.uid
-    console.log(user.uid)
+    // console.log(user.uid)
     qrArray.push(id)
-   
+    console.log(qrArray)
+
     new Playbill 
     addQRValue( qrArray );
 
+  if (db.collection("users").doc(user.uid) === null) {
+
     db.collection("users").doc(user.uid).set({
-      playbill: {
-        PDF: pdf,
-        Image: image, 
-        Id: id
-      }
-    }, { merge: true })
-    .then(function(docRef) {
-      // console.log("Document written with ID: ");
-   })
-    .catch(function(error) {
-      console.error("Error adding document: ", error);
-   });
+          ID: id
+        }, { merge: true })
+        .then(function(docRef) {
+          //  console.log("Document written with ID: " + id);
+       })
+        .catch(function(error) {
+          console.error("Error adding document: ", error);
+       });
+
+  } else if (db.collection("users").doc(user.uid) != null) {
+
+    var playbills = db.collection("users").doc(user.uid)
+
+    playbills.update({
+      pdf: firebase.firestore.FieldValue.arrayUnion(pdf),
+      image: firebase.firestore.FieldValue.arrayUnion(image),
+      id: firebase.firestore.FieldValue.arrayUnion(id)
+    }) 
+
+  }
+
 
    navigation.navigate('LibraryScreen02')
-                    
+
 
   };
 

@@ -85,11 +85,13 @@ class SignUpScreen extends React.Component {
         var db = firebase.firestore();
         var user = firebase.auth().currentUser;
         db.collection("users").doc(user.uid).set({
+          userData: {
           email: this.state.email,
           name: this.state.name,
           zipcode: this.state.zipcode,
           birthdate: this.state.birthdate,
           gender: this.state.gender
+          }
         }, { merge: true })
         .then(function(docRef) {
           console.log("Document written with ID: ");

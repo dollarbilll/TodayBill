@@ -4,7 +4,7 @@
     "slug": "TodayBill_HandOff",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/icon/appstore.png",
     "splash": {
       "image": "./assets/screens/splash.png",
       "resizeMode": "contain",
