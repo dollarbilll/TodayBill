@@ -1,9 +1,4 @@
-//firebase,firestore
-import * as firebase from 'firebase';
-import firebaseConfig from './utils/firebaseConfig';
-firebase.initializeApp(firebaseConfig);
-require("firebase/firestore");
-var db = firebase.firestore();
+// EXPO BUNDLE ID --> com.todaybill.todaybillapp
 
 import React, { useState, useEffect } from 'react';
 
@@ -42,15 +37,15 @@ const fetchFonts = () => {
   });
 };
 
-function signOutUser ( {navigation} ) {
+function signOutUser({ navigation }) {
 
-      navigation.navigate('AuthScreen');
-      console.log('e');
+  navigation.navigate('AuthScreen');
+
 
 }
 
-export default function App( {navigation} ) {
-  console.log("16");
+export default function App({ navigation }) {
+ 
   //font 
   const [dataLoaded, setDataLoaded] = useState(false);
   if (!dataLoaded) {
@@ -63,64 +58,70 @@ export default function App( {navigation} ) {
     );
   }
 
-    
+
 
   //no capital latter in input fields
   //loading screen/animation for log in / sign up into library 
   //catch(error) and alert(error) for 
-  
+
 
   return (
     // <SignUpScreen />
     <QRProvider>
-    <NavigationContainer>
-    <Stack.Navigator 
-      initialRouteName="Auth"
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: '#FF2D11',
-        },
-        // headerTintColor: '#fff',
-        headerTitleStyle: {
-          fontFamily: 'graphique-regular',
-          fontSize: 35,
-          fontWeight: '200',
-          color: 'white',
-          textAlign: 'center'
-        },
-        title: 'TODAYBILL',
-        headerBackTitle: 'Back'
-      }} >
-      {/* <Stack.Screen name="LoadingScreen" component={LoadingScreen}
+      <NavigationContainer>
+        <Stack.Navigator
+          initialRouteName="Auth"
+          screenOptions={{
+            headerStyle: {
+              backgroundColor: '#FF2D11',
+            },
+            // headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontFamily: 'graphique-regular',
+              fontSize: 35,
+              fontWeight: '200',
+              color: 'white',
+              textAlign: 'center'
+            },
+            title: 'TODAYBILL',
+            headerBackTitle: 'Back'
+          }} >
+          {/* <Stack.Screen name="LoadingScreen" component={LoadingScreen}
       /> */}
-      <Stack.Screen name="AuthScreen" component={AuthScreen} 
-      options={{
-        headerTransparent: true,
-      title: ''
-    }} />
-    
-        <Stack.Screen 
-          name="LibraryScreen02" 
-          component={LibraryScreen02} 
-          options={{
-            headerLeft: null,
-            headerRight: null
-          }}
+          <Stack.Screen name="AuthScreen" component={AuthScreen}
+            options={{
+              headerTransparent: true,
+              title: ''
+            }} />
 
+          <Stack.Screen
+            name="LibraryScreen02"
+            component={LibraryScreen02}
+            options={({route, navigation}) => ({
+              headerLeft: null,
+              headerRight: () => (
+                <Button
+                  onPress={() => navigation.navigate('AuthScreen')}
+                  title="Log Out"
+                  color="#fff"
+                  />
+              )       
+            })
+          }
           />
-        <Stack.Screen name="QRScreen" component={QRScreen} />
-        <Stack.Screen name="PDFScreen" component={PDFScreen} /> 
-      <Stack.Screen 
-        name="SignUpScreen" 
-        component={SignUpScreen} 
-        options={{
-          headerLeft: null
-        }}
-        />
-    </Stack.Navigator>
-  </NavigationContainer>
-  </QRProvider>
-  
+          <Stack.Screen name="QRScreen" component={QRScreen} />
+          <Stack.Screen name="PDFScreen" component={PDFScreen} />
+          <Stack.Screen
+            name="SignUpScreen"
+            component={SignUpScreen}
+            options={{
+              headerLeft: null
+            }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </QRProvider>
+
   );
 }
 

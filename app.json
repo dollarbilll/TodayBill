@@ -20,7 +20,9 @@
     "facebookAppId": "702588700600049",
     "facebookDisplayName": "TodayBill",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "com.todaybill.todaybillapp",
+      "buildNumber": "1.0.0"
     },
     "web": {
       "favicon": "./assets/favicon.png"

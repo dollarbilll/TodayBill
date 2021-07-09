@@ -1,84 +1,114 @@
-import React, { useContext } from 'react';
-import { 
-    StyleSheet, 
-    FlatList, 
-    Text, 
+import * as firebase from 'firebase';
+
+
+
+import React, { useContext, useEffect, useState } from 'react';
+import {
+    StyleSheet,
+    FlatList,
+    Text,
     View,
     TouchableOpacity,
     Image,
- } from 'react-native';
+} from 'react-native';
 
-import { PLAYBILLS } from '../DummyData';
-import Playbill from '../models/PlaybillConstructor';
-import LibraryScreen from './LibraryScreen';
+
 import { ScrollView } from 'react-native-gesture-handler';
 import { LinearGradient } from 'expo-linear-gradient';
-import { max } from 'react-native-reanimated';
+
 import _ from 'lodash';
-import { render } from 'react-dom';
+
 import { useLibraryList, useLibraryListUpdate } from '../store/QRContext';
+
 
 const maxItemHeight = 151;
 
 const LibraryScreen02 = props => {
     const qrValue = useLibraryList()
     const addQRValue = useLibraryListUpdate()
+    const [items, setItems] = useState([])
+    var db = firebase.firestore();
+    var user = firebase.auth().currentUser;
+    var documentReference = db.collection('users').doc(user.uid);
 
-    const renderLibraryItem = (itemData) => {
-     return (
-            <TouchableOpacity 
-            style={styles.libraryItem}
-            onPress={() => {
-                props.navigation.navigate('PDFScreen', 
-                    {
-                        pdf: itemData.item.pdf,
-                        image: itemData.item.image
-                    });
-                    }
+    useEffect(
+        () => {
+            const loadUserData = async () => {
+                documentReference.get().then(function(documentSnapshot){
+                    console.log("LIBRARY " + items.length + 1)
+                    
+                const playbillFirestore = documentSnapshot.data();
+               
+                var combinedItems = [];
+                for(var i = 0; i < playbillFirestore.image.length; i++){
+                    combinedItems.push({image: playbillFirestore.image[i], pdf: playbillFirestore.pdf[i]})
+                }
+                console.log("LIBRARY " + combinedItems.length)
+                setItems(combinedItems)
+           
+                console.log("LIBRARY " + items.length + 2)
+                });
+            }
+            loadUserData()
+        }, []
+    )
+
+     const renderLibraryItem = (itemData) => {        
+        return (
+            <TouchableOpacity
+                style={styles.libraryItem}
+                onPress={() => {
+                    props.navigation.navigate('PDFScreen',
+                        {
+                            pdf: itemData.item.pdf,
+                            image: itemData.item.image
+                        });
+                }
                 } >
                 <View style={styles.libraryItem}>
-                    <Image 
-                         source={{uri: itemData.item.image}} 
-                            style={{ width: 75, height: maxItemHeight-50, resizeMode: 'contain'}}
-                         />
+                    <Image
+                        source={{ uri: itemData.item.image }}
+                        style={{ width: 75, height: maxItemHeight - 50, resizeMode: 'contain' }}
+                    />
                 </View>
             </TouchableOpacity>
-    );
-};
+        );
+    };
 
     return (
-        <ScrollView style={styles.screen}>  
-            <View style={styles.buttonContainer}> 
-                    <TouchableOpacity 
-                        onPress={() => {
+        <ScrollView style={styles.screen}>
+            <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                    onPress={() => {
                         props.navigation.navigate('QRScreen')
-                        }} >
-                    <Image 
+                    }} >
+                    <Image
                         style={styles.scanImage}
-                        source = {require('../assets/screens/library/scan/scan.png')} />
-                    </TouchableOpacity>
+                        source={require('../assets/screens/library/scan/scan.png')} />
+                </TouchableOpacity>
             </View>
             <View style={styles.shelving}>
                 <View style={styles.gradient}>
-                    { 
-                    _.range(Math.max(4, Math.ceil(PLAYBILLS.length/3))).map(i => 
-                    <LinearGradient
-                        colors={['white', '#F5EFEE', '#ede5e1']}
-                        style={{
-                        height: maxItemHeight,
-                        width: '100%'
-                        }}
-                        >
-                    </LinearGradient>)}
+                    {
+                        _.range(Math.max(4, Math.ceil(items.length / 3))).map(i =>
+                            <LinearGradient
+                                colors={['white', '#F5EFEE', '#ede5e1']}
+                                style={{
+                                    height: maxItemHeight,
+                                    width: '100%'
+                                }}
+                            >
+                            </LinearGradient>)}
                 </View>
-                <View style={styles.flatlist}> 
-                        <FlatList 
-                            // id={item.id}
-                            data={qrValue} 
-                            renderItem={renderLibraryItem} 
-                            numColumns={3} 
-                            columnWrapperStyle={styles.rowStyle}
-                            contentContainerStyle={styles.flatlist} />
+                <View style={styles.flatlist}>
+                    <FlatList
+                        // id={item.id}
+                        // data={qrValue}
+                        data={items}
+                        renderItem={renderLibraryItem}
+                        numColumns={3}
+                        columnWrapperStyle={styles.rowStyle}
+                        contentContainerStyle={styles.flatlist} />
                 </View>
             </View>
         </ScrollView>
@@ -89,7 +119,7 @@ const LibraryScreen02 = props => {
 
 const styles = StyleSheet.create({
     libraryItem: {
-        display: 'flex', 
+        display: 'flex',
         flexDirection: 'column-reverse',
         flexGrow: 1,
         height: maxItemHeight,
@@ -100,8 +130,8 @@ const styles = StyleSheet.create({
         width: '100%',
         alignItems: 'center',
         resizeMode: 'contain',
-        
-        
+
+
     },
     screen: {
         display: 'flex',
@@ -128,7 +158,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 0,
         left: 0,
-        width: '100%', 
+        width: '100%',
     },
     flatlist: {
         // justifyContent: 'flex-start',

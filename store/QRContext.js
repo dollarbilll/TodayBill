@@ -1,18 +1,20 @@
+import * as firebase from 'firebase';
+import firebaseConfig from '../utils/firebaseConfig';
+firebase.initializeApp(firebaseConfig);
+require("firebase/firestore");
+var db = firebase.firestore();
+var user = firebase.auth().currentUser;
+
 import React, { useContext, useState, useEffect } from 'react';
 import { PLAYBILLS } from '../DummyData';
 import Playbill from '../models/PlaybillConstructor';
 import { random } from 'lodash';
 
 const QRContext = React.createContext()
-const QRUpdateContext = React.createContext() 
-
-// import * as firebase from 'firebase';
-// var db = firebase.firestore();
-// var user = firebase.auth().currentUser;
+const QRUpdateContext = React.createContext()
 
 
-
-export function useLibraryList(){
+export function useLibraryList() {
     return useContext(QRContext)
 }
 
@@ -21,44 +23,46 @@ export function useLibraryListUpdate() {
 }
 
 export function QRProvider({ children }) {
-    const [everythingcurrentlyintheuserslibrary, seteverythingcurrentlyintheuserslibrary] = useState(PLAYBILLS)
+    const [everythingcurrentlyintheuserslibrary, seteverythingcurrentlyintheuserslibrary] = useState([])
 
-    // initializing library with current user's playbills from firestore 
-    useEffect(
-        () => {
-            const loadUserData = async() => { 
-                const playbillFirestore = await db.get(everythinginthatcollectionuid)
-                seteverythingcurrentlyintheuserslibrary(playbillFirestore) 
-            }
-            loadUserData()            
-            // console.log(playbillFirestore)
-        }, []
-    )
+    function addQRValue(image, pdf, id, items) {
 
-    function addQRValue(qrdataContext) {
-        
-        let qrContextArray = qrdataContext.toString().split(",");
-        // let qrContextArray = qrdataContext;
-        console.log("qrContextArray" + qrContextArray)
-        console.log("qrdataContext" + qrdataContext)
-
-        let image = qrContextArray[0];
-        let pdf = qrContextArray[1];
-        let id = qrContextArray[2];
         let newplaybilladd = new Playbill(id, image, pdf);
-        // console.log("pdf" + pdf)
-        // console.log("image" + image)
-        // console.log("id" + id)
-        console.log("newplaybilladd" + newplaybilladd)
-        seteverythingcurrentlyintheuserslibrary(everythingcurrentlyintheuserslibrary.concat([newplaybilladd]));
-        // console.log(everythingcurrentlyintheuserslibrary)
-        console.log(PLAYBILLS)
+       
+       
+   
+        seteverythingcurrentlyintheuserslibrary(items.concat([newplaybilladd]));
+    
+        console.log("EVERYTHINGINUSERSLIBRARY" + everythingcurrentlyintheuserslibrary)
+
+        if (user != null && db.collection("users").doc(user.uid) === null) {
+
+            db.collection("users").doc(user.uid).set({
+                ID: id
+            }, { merge: true })
+                .then(function (docRef) {
+                 
+                })
+                .catch(function (error) {
+                    console.error("Error adding document: ", error);
+                });
+
+        } else if (user != null && db.collection("users").doc(user.uid) != null) {
+
+            var playbills = db.collection("users").doc(user.uid)
+
+            playbills.update({
+                pdf: firebase.firestore.FieldValue.arrayUnion(pdf),
+                image: firebase.firestore.FieldValue.arrayUnion(image),
+                id: firebase.firestore.FieldValue.arrayUnion(id)
+            })
+        }
     }
-  
-    return(
+
+    return (
         <QRContext.Provider value={everythingcurrentlyintheuserslibrary}>
             <QRUpdateContext.Provider value={addQRValue} >
-            {children}
+                {children}
             </QRUpdateContext.Provider>
         </QRContext.Provider>
     )

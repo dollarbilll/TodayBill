@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useReducer, useCallback } from 'react';
 import {
-  ScrollView,
-  View,
-  StyleSheet,
-  Button,
-  Text,
-  TouchableOpacity,
-  Alert
+    ScrollView,
+    View,
+    StyleSheet,
+    Button,
+    Text,
+    TouchableOpacity,
+    Alert
 } from 'react-native';
 // import { LinearGradient } from 'expo-linear-gradient';
 // import { useDispatch } from 'react-redux';
@@ -24,9 +24,9 @@ import * as Facebook from 'expo-facebook';
 import firebaseConfig from '../utils/firebaseConfig';
 const facebookAppId = firebaseConfig.facebookAppId;
 
-export default class AuthScreen extends React.Component{
+export default class AuthScreen extends React.Component {
 
-    constructor(props){
+    constructor(props) {
         super(props)
 
         this.state = ({
@@ -37,147 +37,147 @@ export default class AuthScreen extends React.Component{
 
     onLoginSuccess() {
         this.props.navigation.navigate('LibraryScreen02');
-      }
-      onLoginFailure(errorMessage) {
+    }
+    onLoginFailure(errorMessage) {
         this.setState({ error: errorMessage, loading: false });
-      }
+    }
 
     componentDidMount() {
         firebase.auth().onAuthStateChanged((user) => {
-            if(user != null) {
+            if (user != null) {
                 // console.log(user)
             }
         })
     }
 
-    loginUser = ( email, password) => {
-       
-            firebase.auth().signInWithEmailAndPassword(email, password)
+    loginUser = (email, password) => {
+
+        firebase.auth().signInWithEmailAndPassword(email, password)
             .then(this.onLoginSuccess.bind(this))
             .catch(error => {
-                    let errorCode = error.code;
-                    let errorMessage = error.message;
-                    this.onLoginFailure.bind(this)(alert("Incorrect Email or Password"));
-                
-                })
-        
+                let errorCode = error.code;
+                let errorMessage = error.message;
+                this.onLoginFailure.bind(this)(alert("Incorrect Email or Password"));
+
+            })
+
     }
 
     async logInWithFacebook() {
         try {
-          // console.log(facebookAppId, typeof(facebookAppId));
-          await Facebook.initializeAsync(facebookAppId);
-          const { type, token } = await Facebook.logInWithReadPermissionsAsync({
-            permissions: ['public_profile'],
-          });
-          if (type === 'success') {
-            await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-            const credential = firebase.auth.FacebookAuthProvider.credential(token);
-            const facebookProfileData = await firebase.auth().signInWithCredential(credential);
-            this.onLoginSuccess.bind(this)
-            this.props.navigation.navigate('LibraryScreen02')
-          }
+            // console.log(facebookAppId, typeof(facebookAppId));
+            await Facebook.initializeAsync(facebookAppId);
+            const { type, token } = await Facebook.logInWithReadPermissionsAsync({
+                permissions: ['public_profile'],
+            });
+            if (type === 'success') {
+                await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+                const credential = firebase.auth.FacebookAuthProvider.credential(token);
+                const facebookProfileData = await firebase.auth().signInWithCredential(credential);
+                this.onLoginSuccess.bind(this)
+                this.props.navigation.navigate('LibraryScreen02')
+            }
         } catch ({ message }) {
-          alert(`Facebook Login Error: ${message}`);
+            alert(`Facebook Login Error: ${message}`);
         }
-      }
+    }
 
     render() {
-    return (
-        <ScrollView style={styles.authContainer}>
-            <View style={styles.header}>
-                <View style={styles.titleContainer}>
-                    <Text style={styles.titleText}>TodayBill</Text>
-                    <View style={styles.subtitleContainer}>
-                        <Text style={styles.subtitleText}>Keep your programs digitally on hand!</Text>
+        return (
+            <ScrollView style={styles.authContainer}>
+                <View style={styles.header}>
+                    <View style={styles.titleContainer}>
+                        <Text style={styles.titleText}>TodayBill</Text>
+                        <View style={styles.subtitleContainer}>
+                            <Text style={styles.subtitleText}>Keep your programs digitally on hand!</Text>
+                        </View>
                     </View>
                 </View>
-            </View>
-            {/* <View style={styles.cardFlex}> */}
-            <View style={styles.cardContainer}>
-                <View style={styles.usernameContainer}> 
-                    <View style={styles.iconContainer}>
-                        {/* <MaterialCommunityIcons name="account" size={30} color="gray" /> */}
+                {/* <View style={styles.cardFlex}> */}
+                <View style={styles.cardContainer}>
+                    <View style={styles.usernameContainer}>
+                        <View style={styles.iconContainer}>
+                            {/* <MaterialCommunityIcons name="account" size={30} color="gray" /> */}
+                        </View>
+                        <View >
+                            <TextInput
+                                style={{
+                                    height: 20,
+                                    width: 230,
+                                    borderColor: 'gray',
+                                    borderWidth: 1,
+                                    borderTopWidth: 0,
+                                    borderLeftWidth: 0,
+                                    borderRightWidth: 0
+                                }}
+                                onChangeText={(email) => this.setState({ email })}
+                                placeholder="Email"
+                                placeholderTextColor="#B1B1B1"
+                                returnKeyType="done"
+                                textContentType="name"
+                                autoCapitalize='none'
+                            />
+                        </View>
                     </View>
-                    <View >
-                    <TextInput
-                        style={{ 
-                        height: 20, 
-                        width: 230, 
-                        borderColor: 'gray', 
-                        borderWidth: 1,
-                        borderTopWidth: 0,
-                        borderLeftWidth: 0,
-                        borderRightWidth: 0
-                         }}
-                        onChangeText={(email) => this.setState({email})}
-                        placeholder="Email"
-                        placeholderTextColor="#B1B1B1"
-                        returnKeyType="done"
-                        textContentType="name"
-                        autoCapitalize='none'
-                    />
+                    <View style={styles.usernameContainer}>
+                        <View style={styles.iconContainer}>
+                            {/* <AntDesign name="lock" size={30} color="gray" /> */}
+                        </View>
+                        <View >
+                            <TextInput
+                                style={{
+                                    height: 20,
+                                    width: 230,
+                                    borderColor: 'gray',
+                                    borderWidth: 1,
+                                    borderTopWidth: 0,
+                                    borderLeftWidth: 0,
+                                    borderRightWidth: 0,
+                                    color: 'black'
+                                }}
+                                placeholder="Password"
+                                placeholderTextColor="#B1B1B1"
+                                returnKeyType="done"
+                                textContentType="Password"
+                                autoCapitalize='none'
+                                secureTextEntry={true}
+                                onChangeText={(password) => this.setState({ password })}
+                            />
+                        </View>
                     </View>
                 </View>
-                <View style={styles.usernameContainer}> 
-                    <View style={styles.iconContainer}>
-                        {/* <AntDesign name="lock" size={30} color="gray" /> */}
-                    </View>
-                    <View >
-                        <TextInput
-                            style={{ 
-                                height: 20, 
-                                width: 230, 
-                                borderColor: 'gray', 
-                                borderWidth: 1,
-                                borderTopWidth: 0,
-                                borderLeftWidth: 0,
-                                borderRightWidth: 0,
-                                color: 'black'
-                            }}
-                            placeholder="Password"
-                            placeholderTextColor="#B1B1B1"
-                            returnKeyType="done"
-                            textContentType="Password"
-                            autoCapitalize='none'
-                            secureTextEntry={true}
-                            onChangeText={(password) => this.setState({password})}
-                        />
-                    </View>
+                {/* </View> */}
+                <View style={styles.buttonView}>
+
+                    <TouchableOpacity style={[styles.buttonContainer, styles.signInButton]}
+                        onPress={() =>
+                            this.loginUser(this.state.email, this.state.password)}>
+
+                        <View style={styles.socialButtonContent}>
+                            <Text style={styles.loginText}>     Sign In</Text>
+                        </View>
+                    </TouchableOpacity>
                 </View>
-            </View>
-        {/* </View> */}
-        <View style={styles.buttonView}>
-            
-            <TouchableOpacity style={[styles.buttonContainer, styles.signInButton]}
-                onPress={() => 
-                    this.loginUser(this.state.email, this.state.password)}>
-                    
-                <View style={styles.socialButtonContent}>
-                    <Text style={styles.loginText}>     Sign In</Text>
+                <View style={styles.buttonView}>
+                    <TouchableOpacity style={[styles.buttonContainer, styles.fabookButton]} onPress={() => this.logInWithFacebook()}>
+                        <View style={styles.socialButtonContent}>
+                            <AntDesign name="facebook-square" size={24} color="white" />
+                            <Text style={styles.loginText}>     Sign in with Facebook</Text>
+                        </View>
+                    </TouchableOpacity>
                 </View>
-            </TouchableOpacity>
-        </View>
-        <View style={styles.buttonView}>
-            <TouchableOpacity style={[styles.buttonContainer, styles.fabookButton]} onPress={() => this.logInWithFacebook()}>
-                <View style={styles.socialButtonContent}>
-            <AntDesign name="facebook-square" size={24} color="white" />
-            <Text style={styles.loginText}>     Sign in with Facebook</Text>
+                <View style={styles.switcherContainer}>
+                    <Text style={styles.switchTextStyle}>Dont have an account?</Text>
+                    <Text style={styles.switchButtonStyle} onPress={() => { this.props.navigation.navigate('SignUpScreen') }}
+                    >SIGN UP</Text>
                 </View>
-            </TouchableOpacity>
-        </View>
-            <View style={styles.switcherContainer}>
-                <Text style={styles.switchTextStyle}>Dont have an account?</Text>
-                <Text style={styles.switchButtonStyle} onPress={() => {this.props.navigation.navigate('SignUpScreen')}}
-                >SIGN UP</Text> 
-            </View>
-         </ScrollView>
-    );
-}
+            </ScrollView>
+        );
+    }
 }
 
 const styles = StyleSheet.create({
-    header: 
+    header:
     {
         width: '100%',
         height: '35%',
@@ -190,9 +190,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         resizeMode: 'contain',
         marginTop: '17%'
-        
+
     },
-    titleText: 
+    titleText:
     {
         fontSize: 63,
         fontFamily: 'graphique-regular',
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
         // marginVertical: 10
 
     },
-    subtitleText: 
+    subtitleText:
     {
         fontFamily: 'montserrat-bold',
         fontSize: 16,
@@ -216,9 +216,9 @@ const styles = StyleSheet.create({
         color: 'white',
         textAlign: 'center'
     },
-    authContainer: 
+    authContainer:
     {
-        
+
     },
     usernameContainer: {
         width: '80%',
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
     cardFlex: {
         // flexGrow: 2
     },
-    cardContainer: 
+    cardContainer:
     {
         width: '100%',
         flexGrow: 5,
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         // elevation: 5
     },
-    switcherContainer: 
+    switcherContainer:
     {
         width: '100%',
         justifyContent: 'center',
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
         // marginLeft: 75,
         marginTop: '10%',
         marginBottom: '15%'
-        
+
     },
     switchTextStyle: {
         opacity: 0.4,
@@ -295,29 +295,29 @@ const styles = StyleSheet.create({
         resizeMode: 'contain'
     },
     buttonContainer: {
-        height:49,
+        height: 49,
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 10,
-        width:'75%',
-        borderRadius:4,
-      },
-      fabookButton: {
+        width: '75%',
+        borderRadius: 4,
+    },
+    fabookButton: {
         backgroundColor: "#3b5998",
-        height: 49  
-      },
-      signInButton: {
+        height: 49
+    },
+    signInButton: {
         backgroundColor: '#ff2508'
-      },
-      socialButtonContent:{
+    },
+    socialButtonContent: {
         flexDirection: 'row',
         justifyContent: 'center',
-        alignItems: 'center', 
-      },
-      loginText: {
+        alignItems: 'center',
+    },
+    loginText: {
         color: 'white',
-      },
+    },
 
 
 })
